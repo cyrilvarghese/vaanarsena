@@ -99,21 +99,15 @@ public class ActivateStory : MonoBehaviour
         //assetname is ket same as prefab /gameobject name
         appManager.characterId = assetName;
         AssetBundle bundle = AssetBundleManager.getAssetBundle(assetName);
-        List<string> names = AssetBundleManager.GetAllAssetNames();
-        
-       
 
-        if (names != null && !names.Contains(assetName))
+
+        if (!bundle)
         {
             string uri = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/" + assetName;
-            
-            //UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(uri);
-            //request.SendWebRequest();
-
-
-            UnityWebRequest request = UnityWebRequest.Get(uri);
+            UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(uri);
             request.SendWebRequest();
             StartCoroutine(ShowCircularProgress(index, uri, request));
+
 
         }
         else
@@ -143,10 +137,13 @@ public class ActivateStory : MonoBehaviour
         ProgressSlider.gameObject.SetActive(false);
       
         AssetBundle myLoadedAssetBundleAR = DownloadHandlerAssetBundle.GetContent(requestAR);
+
+
+
+
+       
+
         AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, uriAR, assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject);
-
-
-
 
 
     }
@@ -160,22 +157,18 @@ public class ActivateStory : MonoBehaviour
             m_SpinnerImage.rectTransform.Rotate(Vector3.forward, 90.0f * Time.deltaTime);
             yield return new WaitForSeconds(.1f);
         }
-
-        string tempPath = Path.Combine(Application.persistentDataPath, "AssetData");
-        tempPath = Path.Combine(tempPath, assetName + ".unity3d");
-        AssetBundleManager.Save(request.downloadHandler.data, tempPath);
-        AssetBundle myLoadedAssetBundle = AssetBundle.LoadFromFile(tempPath); ;
-        var info = new DirectoryInfo(Path.Combine(Application.persistentDataPath, "AssetData"));
-        var fileInfo = info.GetFiles();
-
         ARBtn.gameObject.SetActive(true);
-
-
-     //   AssetBundle myLoadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
-
+        AssetBundle myLoadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
         InstantiateStoryAndAddtoList(myLoadedAssetBundle, index);
+
+        //
+      
+
+
+
         //start AR call
         GetARData();
+
 
 
 
