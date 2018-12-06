@@ -144,7 +144,19 @@ static public class AssetBundleManager
             Debug.LogWarning("Error: " + e.Message);
         }
     }
+    public static AssetBundle GetBundleFromCache(string assetName)
+    {
+       
+        AssetBundle bundle = null;
+        var bundlePath = Path.Combine(Path.Combine(Application.persistentDataPath, "AssetData"), assetName + ".unity3d");
+        var info = new DirectoryInfo(Path.Combine(Application.persistentDataPath, "AssetData"));
+        var fileInfo = info.GetFiles();
+        if (System.IO.File.Exists(bundlePath)){
+            bundle = AssetBundle.LoadFromFile(bundlePath);
+        }
 
+        return bundle;
+    }
     public static List<string> GetAllAssetNames()
     {
         if (arrayNames==null)

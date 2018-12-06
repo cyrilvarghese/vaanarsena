@@ -100,15 +100,20 @@ public class ActivateStory : MonoBehaviour
         appManager.characterId = assetName;
         AssetBundle bundle = AssetBundleManager.getAssetBundle(assetName);
 
-
-        if (!bundle)
+        if (!bundle)//if not found in app cache/ was not loaded in this app session 
         {
             string uri = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/" + assetName;
-            UnityEngine.Networking.UnityWebRequest request = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(uri);
-            request.SendWebRequest();
-            StartCoroutine(ShowCircularProgress(index, uri, request));
-
-
+            AssetBundle bundleFromCache = AssetBundleManager.GetBundleFromCache(assetName);
+            if (bundleFromCache)//then load the assetbundle from the file of fole exit
+            {
+                InstantiateStoryAndAddtoList(bundleFromCache, index);
+            }
+            else
+            {
+                UnityEngine.Networking.UnityWebRequest request = UnityWebRequest.Get(uri);
+                request.SendWebRequest();
+                StartCoroutine(ShowCircularProgress(index, uri, request));
+            }
         }
         else
         {
@@ -119,8 +124,65 @@ public class ActivateStory : MonoBehaviour
 
     }
 
+    public IEnumerator ShowCircularProgress(int index, string uri, UnityEngine.Networking.UnityWebRequest request)
+    {
+        while (!request.isDone)
+        {
+            ProgressTextCircular.text = Math.Round(request.downloadProgress * 100) + "% ";
+            m_SpinnerImage.rectTransform.Rotate(Vector3.forward, 90.0f * Time.deltaTime);
+            yield return new WaitForSeconds(.1f);
+        }
+        ARBtn.gameObject.SetActive(true);
+
+        var bundlePath = Path.Combine(Path.Combine(Application.persistentDataPath, "AssetData"), assetName + ".unity3d");
+        AssetBundleManager.Save(request.downloadHandler.data, bundlePath);
+        AssetBundle myLoadedAssetBundle = AssetBundle.LoadFromFile(bundlePath);
+        InstantiateStoryAndAddtoList(myLoadedAssetBundle, index);
+
+        //start AR call
+        AssetBundle bundle = AssetBundleManager.getAssetBundle(assetName + "ar");
+
+
+        GetARData();
+
+    }
+
+
+    public void GetARData()
+    {
+        AssetBundle bundle = AssetBundleManager.getAssetBundle(assetName + "-ar");
+
+        if (!bundle)//if not found in app cache/ was not loaded in this app session 
+        {
+            Debug.Log("found AR asset on app cache");
+            AssetBundle bundleFromCache = AssetBundleManager.GetBundleFromCache(assetName + "-ar");
+            if (bundleFromCache)//then load the assetbundle from the file of fole exit
+            {
+                Debug.Log("found AR asset on disk");
+                AddARAssetBundleToList(bundleFromCache);
+                UnityEngine.SceneManagement.SceneManager.LoadScene("3-AR-Character");
+
+            }
+            else
+            {
+                Debug.Log("did not find AR asset on disk. Downloading asset");
+                string uriAR = BaseURL + assetName + "-ar";
+                UnityEngine.Networking.UnityWebRequest requestAR = UnityWebRequest.Get(uriAR);
+                requestAR.SendWebRequest();
+
+                StartCoroutine(ShowProgress(uriAR, requestAR));
+
+            }
+        }
+        else
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("3-AR-Character");
+        }
+
+    }
     public IEnumerator ShowProgress(string uriAR, UnityEngine.Networking.UnityWebRequest requestAR)
     {
+
         while (!requestAR.isDone)
         {
             Debug.Log(string.Format("Downloaded {0:P1}", requestAR.downloadProgress));
@@ -135,65 +197,35 @@ public class ActivateStory : MonoBehaviour
         }
         ProgressSlider.value = 1;
         ProgressSlider.gameObject.SetActive(false);
-      
-        AssetBundle myLoadedAssetBundleAR = DownloadHandlerAssetBundle.GetContent(requestAR);
 
-
-
-
-       
-
+        var bundlePath = Path.Combine(Path.Combine(Application.persistentDataPath, "AssetData"), assetName + "-ar" + ".unity3d");
+        AssetBundleManager.Save(requestAR.downloadHandler.data, bundlePath);
+        AssetBundle myLoadedAssetBundleAR = AssetBundle.LoadFromFile(bundlePath);
         AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, uriAR, assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject);
 
-
     }
-
-
-    public IEnumerator ShowCircularProgress(int index, string uri, UnityEngine.Networking.UnityWebRequest request)
+    public void AddARAssetBundleToList(AssetBundle myLoadedAssetBundleAR)
     {
-        while (!request.isDone)
-        {
-            ProgressTextCircular.text = Math.Round(request.downloadProgress * 100) + "% ";
-            m_SpinnerImage.rectTransform.Rotate(Vector3.forward, 90.0f * Time.deltaTime);
-            yield return new WaitForSeconds(.1f);
-        }
-        ARBtn.gameObject.SetActive(true);
-        AssetBundle myLoadedAssetBundle = DownloadHandlerAssetBundle.GetContent(request);
-        InstantiateStoryAndAddtoList(myLoadedAssetBundle, index);
-
-        //
-      
-
-
-
-        //start AR call
-        GetARData();
-
-
-
-
+        AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, BaseURL + assetName + "-ar", assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject);
     }
+
+
     public void InstantiateStoryAndAddtoList(AssetBundle myLoadedAssetBundle, int index)
     {
         var prefab = myLoadedAssetBundle.LoadAsset(assetName);
         Stories[index].SetActive(true);
         Instantiate(prefab, Stories[index].transform);
+        ARBtn.gameObject.SetActive(true);
+
         AssetBundleManager.AddAssetBundle(myLoadedAssetBundle, BaseURL + assetName, assetName, myLoadedAssetBundle.LoadAsset(assetName) as GameObject);
 
     }
 
-    public void GetARData()
-    {
-        string uriAR = BaseURL + assetName + "-ar";
-        UnityEngine.Networking.UnityWebRequest requestAR = UnityEngine.Networking.UnityWebRequestAssetBundle.GetAssetBundle(uriAR);
-        requestAR.SendWebRequest();
-        StartCoroutine(ShowProgress(uriAR, requestAR));
-    }
+
     public void LoadScene()
     {
-        AssetBundle bundle = AssetBundleManager.getAssetBundle(assetName+"-ar");
 
-        if (ProgressSlider.value == 1 || bundle != null)
+        if (ProgressSlider.value == 1)
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene("3-AR-Character");
 
@@ -201,8 +233,12 @@ public class ActivateStory : MonoBehaviour
         else
         {
             GetARData();
-            ProgressSlider.gameObject.SetActive(true);
-            ARBtn.SetActive(false);
+            AssetBundle bundle = AssetBundleManager.getAssetBundle(assetName + "-ar");
+            if (!bundle)//if not found in app cache/ was not loaded in this app session 
+            {
+                ProgressSlider.gameObject.SetActive(true);
+                ARBtn.SetActive(false);
+            }
 
         }
     }
