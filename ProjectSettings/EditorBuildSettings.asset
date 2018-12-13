@@ -6,15 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 1
     path: Assets/Scenes/0-Splash.unity
     guid: b6e6686a427312b42a246824e25175dc
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/1-Menu.unity
     guid: 3843db3d5974e3b4fad826d235f54148
   - enabled: 1
     path: Assets/Scenes/3-AR-Character.unity
     guid: be93eab0a8c53d04383799b692203706
+  - enabled: 0
+    path: Assets/Scenes/3-AR-Character 1.unity
+    guid: 004af947ccc154df3ba931ec9257c75e
   m_configObjects: {}

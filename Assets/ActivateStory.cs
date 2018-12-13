@@ -20,7 +20,7 @@ public class ActivateStory : MonoBehaviour
     private string assetName;
     public RawImage m_SpinnerImage;
     public GameObject ErrorMessage;
-    private string BaseURL = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/";
+    private string BaseURL = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/iOS/";
 
     public Dictionary<int, string> StoryDictionary;
     AppManager appManager;
@@ -102,14 +102,17 @@ public class ActivateStory : MonoBehaviour
 
         if (!bundle)//if not found in app cache/ was not loaded in this app session 
         {
-            string uri = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/" + assetName;
+            string uri = BaseURL + assetName;
             AssetBundle bundleFromCache = AssetBundleManager.GetBundleFromCache(assetName);
             if (bundleFromCache)//then load the assetbundle from the file of fole exit
             {
+                Debug.Log("found story on disk");
                 InstantiateStoryAndAddtoList(bundleFromCache, index);
             }
             else
             {
+                Debug.Log("did not find story on disk.getting from server");
+
                 UnityEngine.Networking.UnityWebRequest request = UnityWebRequest.Get(uri);
                 request.SendWebRequest();
                 StartCoroutine(ShowCircularProgress(index, uri, request));

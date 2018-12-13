@@ -118,7 +118,7 @@ static public class AssetBundleManager
         //       where kvp.Value.ToString().Contains("ar")
         //       select kvp;
        // var newDictionaty = dictAssetBundleRefs.Where(kvp => kvp.Value.ToString().Contains("ar")) as Dictionary<string,AssetBundleRef>;
-        return dictAssetBundleRefs.Where(i => i.Key.ToString().Contains("ar"))
+        return dictAssetBundleRefs.Where(i => i.Key.ToString().Contains("-ar"))
         .ToDictionary(i => i.Key, i => i.Value);
 
         
