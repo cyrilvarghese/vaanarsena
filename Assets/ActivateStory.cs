@@ -204,12 +204,12 @@ public class ActivateStory : MonoBehaviour
         var bundlePath = Path.Combine(Path.Combine(Application.persistentDataPath, "AssetData"), assetName + "-ar" + ".unity3d");
         AssetBundleManager.Save(requestAR.downloadHandler.data, bundlePath);
         AssetBundle myLoadedAssetBundleAR = AssetBundle.LoadFromFile(bundlePath);
-        AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, uriAR, assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject);
+        AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, uriAR, assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject,true);
 
     }
     public void AddARAssetBundleToList(AssetBundle myLoadedAssetBundleAR)
     {
-        AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, BaseURL + assetName + "-ar", assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject);
+        AssetBundleManager.AddAssetBundle(myLoadedAssetBundleAR, BaseURL + assetName + "-ar", assetName + "-ar", myLoadedAssetBundleAR.LoadAsset(assetName) as GameObject,true);
     }
 
 
@@ -220,7 +220,7 @@ public class ActivateStory : MonoBehaviour
         Instantiate(prefab, Stories[index].transform);
         ARBtn.gameObject.SetActive(true);
 
-        AssetBundleManager.AddAssetBundle(myLoadedAssetBundle, BaseURL + assetName, assetName, myLoadedAssetBundle.LoadAsset(assetName) as GameObject);
+        AssetBundleManager.AddAssetBundle(myLoadedAssetBundle, BaseURL + assetName, assetName, myLoadedAssetBundle.LoadAsset(assetName) as GameObject,false);
 
     }
 

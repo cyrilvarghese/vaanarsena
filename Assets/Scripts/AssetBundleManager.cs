@@ -23,6 +23,7 @@ static public class AssetBundleManager
         public AssetBundle assetBundle = null;
         public GameObject assetGO = null;
         public int version;
+        public bool isAR;
         public string url;
         public AssetBundleRef(string strUrlIn, int intVersionIn)
         {
@@ -101,11 +102,12 @@ static public class AssetBundleManager
             dictAssetBundleRefs.Remove(keyName);
         }
     }
-    public static void AddAssetBundle(AssetBundle bundle,string url, string name,GameObject assetGO)
+    public static void AddAssetBundle(AssetBundle bundle,string url, string name,GameObject assetGO,bool isAR)
     {
         AssetBundleRef abRef = new AssetBundleRef(url, 1);
         abRef.assetBundle = bundle;
         abRef.assetGO = assetGO;
+        abRef.isAR = isAR;
         if (!dictAssetBundleRefs.ContainsKey(name))
         {
             dictAssetBundleRefs.Add(name, abRef);
@@ -118,7 +120,7 @@ static public class AssetBundleManager
         //       where kvp.Value.ToString().Contains("ar")
         //       select kvp;
        // var newDictionaty = dictAssetBundleRefs.Where(kvp => kvp.Value.ToString().Contains("ar")) as Dictionary<string,AssetBundleRef>;
-        return dictAssetBundleRefs.Where(i => i.Key.ToString().Contains("-ar"))
+        return dictAssetBundleRefs.Where(i => i.Value.isAR)
         .ToDictionary(i => i.Key, i => i.Value);
 
         
