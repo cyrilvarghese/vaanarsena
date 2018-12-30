@@ -17,6 +17,8 @@ public class ActivateStory : MonoBehaviour
     public GameObject ARBtn;
     public GameObject LoadingIndicator;
     public GameObject[] Stories;
+    public GameObject StoryContainer;
+    public Transform ScrollViewContent;
     private string assetName;
     public RawImage m_SpinnerImage;
     public GameObject ErrorMessage;
@@ -106,12 +108,12 @@ public class ActivateStory : MonoBehaviour
             AssetBundle bundleFromCache = AssetBundleManager.GetBundleFromCache(assetName);
             if (bundleFromCache)//then load the assetbundle from the file of fole exit
             {
-                Debug.Log("found story on disk");
+                Debug.Log("dev-log:found story on disk");
                 InstantiateStoryAndAddtoList(bundleFromCache, index);
             }
             else
             {
-                Debug.Log("did not find story on disk.getting from server");
+                Debug.Log("dev-log:did not find story on disk.getting from server");
 
                 UnityEngine.Networking.UnityWebRequest request = UnityWebRequest.Get(uri);
                 request.SendWebRequest();
@@ -120,8 +122,14 @@ public class ActivateStory : MonoBehaviour
         }
         else
         {
-            Instantiate(bundle.LoadAsset(assetName), Stories[index].transform);
-            Stories[index].SetActive(true);
+            //Instantiate(bundle.LoadAsset(assetName), Stories[index].transform);
+            //Stories[index].SetActive(true);
+
+            foreach (Transform child in StoryContainer.transform)
+            {
+                GameObject.Destroy(child.gameObject);
+            }
+            Instantiate(bundle.LoadAsset(assetName), StoryContainer.transform);
             ARBtn.gameObject.SetActive(true);
         }
 
@@ -157,18 +165,17 @@ public class ActivateStory : MonoBehaviour
 
         if (!bundle)//if not found in app cache/ was not loaded in this app session 
         {
-            Debug.Log("found AR asset on app cache");
             AssetBundle bundleFromCache = AssetBundleManager.GetBundleFromCache(assetName + "-ar");
             if (bundleFromCache)//then load the assetbundle from the file of fole exit
             {
-                Debug.Log("found AR asset on disk");
+                Debug.Log("dev-log:found AR asset on disk");
                 AddARAssetBundleToList(bundleFromCache);
                 UnityEngine.SceneManagement.SceneManager.LoadScene("3-AR-Character");
 
             }
             else
             {
-                Debug.Log("did not find AR asset on disk. Downloading asset");
+                Debug.Log("dev-log:did not find AR asset on disk. Downloading asset");
                 string uriAR = BaseURL + assetName + "-ar";
                 UnityEngine.Networking.UnityWebRequest requestAR = UnityWebRequest.Get(uriAR);
                 requestAR.SendWebRequest();
@@ -188,9 +195,13 @@ public class ActivateStory : MonoBehaviour
 
         while (!requestAR.isDone)
         {
-            Debug.Log(string.Format("Downloaded {0:P1}", requestAR.downloadProgress));
-            ProgressSlider.value = requestAR.downloadProgress;
-            ProgressText.text = Math.Round(requestAR.downloadProgress * 100) + "% loaded...";
+            Debug.Log(string.Format("dev-log:Downloaded {0:P1}", requestAR.downloadProgress));
+            if(ProgressSlider.value< requestAR.downloadProgress)
+            {
+                ProgressSlider.value = requestAR.downloadProgress;
+                ProgressText.text = Math.Round(requestAR.downloadProgress * 100) + "% loaded...";
+            }
+           
             yield return new WaitForSeconds(.1f);
         }
 
@@ -216,14 +227,18 @@ public class ActivateStory : MonoBehaviour
     public void InstantiateStoryAndAddtoList(AssetBundle myLoadedAssetBundle, int index)
     {
         var prefab = myLoadedAssetBundle.LoadAsset(assetName);
-        Stories[index].SetActive(true);
-        Instantiate(prefab, Stories[index].transform);
-        ARBtn.gameObject.SetActive(true);
+        //Stories[index].SetActive(true);
+        foreach (Transform child in StoryContainer.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+        Instantiate(prefab, StoryContainer.transform);
 
+        ARBtn.gameObject.SetActive(true);
         AssetBundleManager.AddAssetBundle(myLoadedAssetBundle, BaseURL + assetName, assetName, myLoadedAssetBundle.LoadAsset(assetName) as GameObject,false);
 
     }
-
+        
 
     public void LoadScene()
     {
