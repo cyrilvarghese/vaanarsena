@@ -742,7 +742,7 @@ MonoBehaviour:
   - {fileID: 1467454227}
   - {fileID: 135449970}
   StoryContainer: {fileID: 1977954334}
-  ScrollViewContent: {fileID: 0}
+  ScrollViewContent: {fileID: 1320831074}
   m_SpinnerImage: {fileID: 1838094445}
   ErrorMessage: {fileID: 453887432}
 --- !u!114 &47139831

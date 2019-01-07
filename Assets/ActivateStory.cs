@@ -7,7 +7,15 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using Vuforia;
 
+public class Item
+{
+    public string itemName;
+    public Sprite icon;
+    public float price = 1;
+    public string imageThumbnailURL;
+    public string AssetURL;
 
+}
 public class ActivateStory : MonoBehaviour
 {
     public GameObject LightBoxContainer;
@@ -18,10 +26,13 @@ public class ActivateStory : MonoBehaviour
     public GameObject LoadingIndicator;
     public GameObject[] Stories;
     public GameObject StoryContainer;
-    public Transform ScrollViewContent;
     private string assetName;
     public RawImage m_SpinnerImage;
     public GameObject ErrorMessage;
+    public SimpleObjectPool buttonObjectPool;
+    public List<Item> itemList;
+    public Transform ScrollViewContent;
+
     private string BaseURL = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/iOS/";
 
     public Dictionary<int, string> StoryDictionary;
@@ -59,6 +70,7 @@ public class ActivateStory : MonoBehaviour
 
 
         };
+        AddButtons();
 
     }
 
@@ -88,6 +100,25 @@ public class ActivateStory : MonoBehaviour
 
 
     }
+
+    private void AddButtons()
+    {
+        itemList = new List<Item>
+        {
+            new Item{ itemName ="parasu1" ,imageThumbnailURL="",}
+        };
+
+
+        for (int i = 0; i < itemList.Count; i++)
+        {
+            Item item = itemList[i];
+            GameObject newButton = buttonObjectPool.GetObject();
+            newButton.transform.SetParent(ScrollViewContent);
+
+            CustomButton customBtn = newButton.GetComponent<CustomButton>();
+            customBtn.Setup(item, this);
+        }
+    }   
     public void CleanupChildren(int index)
     {
         foreach (Transform child in Stories[index].transform)
