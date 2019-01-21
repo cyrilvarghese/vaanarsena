@@ -1,18 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public class CustomButton : MonoBehaviour
 {
 
     public Button buttonComponent;
-    public Text nameLabel;
-    public Image iconImage;
-    public Text priceText;
-
-
     private Item item;
-    private ShopScrollList scrollList;
+    private ActivateStory scrollList;
 
     // Use this for initialization
     void Start()
@@ -20,18 +16,34 @@ public class CustomButton : MonoBehaviour
         buttonComponent.onClick.AddListener(HandleClick);
     }
 
-    public void Setup(Item currentItem, ShopScrollList currentScrollList)
+    public void Setup(Item currentItem, ActivateStory currentScrollList)
     {
         item = currentItem;
-        nameLabel.text = item.itemName;
-        iconImage.sprite = item.icon;
-        priceText.text = item.price.ToString();
+        
+        StartCoroutine(GetTexture(item));
+
         scrollList = currentScrollList;
 
     }
 
     public void HandleClick()
     {
-        scrollList.TryTransferItemToOtherShop(item);
+        scrollList.ActivateStoryAtIndex(item.index);
+    }
+    IEnumerator GetTexture(Item buttonInfo)
+    {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(buttonInfo.imageThumbnailURL);
+        yield return www.SendWebRequest();
+
+        if (www.isNetworkError || www.isHttpError)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            Texture2D myTexture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            buttonComponent.GetComponent<Image>().sprite = Sprite.Create(myTexture, new Rect(0, 0, myTexture.width, myTexture.height), new Vector2(0, 0));
+
+        }
     }
 }

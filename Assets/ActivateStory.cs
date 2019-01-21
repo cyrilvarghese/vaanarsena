@@ -10,10 +10,17 @@ using Vuforia;
 public class Item
 {
     public string itemName;
+    public int index;
     public Sprite icon;
-    public float price = 1;
     public string imageThumbnailURL;
     public string AssetURL;
+    //public Item(string itemName, int index, string imageThumbnailURL)
+    //{
+    //    this.itemName = itemName;
+    //    this.index = index;
+    //    this.imageThumbnailURL = imageThumbnailURL;
+    //}
+
 
 }
 public class ActivateStory : MonoBehaviour
@@ -33,7 +40,8 @@ public class ActivateStory : MonoBehaviour
     public List<Item> itemList;
     public Transform ScrollViewContent;
 
-    private string BaseURL = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/iOS/";
+    //private string BaseURL = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/iOS/";
+    private string BaseURL = "https://s3-ap-southeast-1.amazonaws.com/vaanarsena/";
 
     public Dictionary<int, string> StoryDictionary;
     AppManager appManager;
@@ -105,7 +113,7 @@ public class ActivateStory : MonoBehaviour
     {
         itemList = new List<Item>
         {
-            new Item{ itemName ="parasu1" ,imageThumbnailURL="",}
+            new Item{ itemName ="parasu1",index=0 ,imageThumbnailURL="https://s3-ap-southeast-1.amazonaws.com/vaanarsena/Thumbnails/001a.jpg",}
         };
 
 
@@ -116,7 +124,7 @@ public class ActivateStory : MonoBehaviour
             newButton.transform.SetParent(ScrollViewContent);
 
             CustomButton customBtn = newButton.GetComponent<CustomButton>();
-            customBtn.Setup(item, this);
+           customBtn.Setup(item, this);
         }
     }   
     public void CleanupChildren(int index)

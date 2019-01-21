@@ -2,17 +2,13 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
-[System.Serializable]
-
-
-public class ShopScrollList : MonoBehaviour
+  
+public class StoryScrollList : MonoBehaviour
 {
 
     public List<Item> itemList;
     public Transform contentPanel;
-    public ShopScrollList otherShop;
-    public Text myGoldDisplay;
+ 
     public SimpleObjectPool buttonObjectPool;
 
     public float gold = 20f;
@@ -26,7 +22,7 @@ public class ShopScrollList : MonoBehaviour
 
     void RefreshDisplay()
     {
-        myGoldDisplay.text = "Gold: " + gold.ToString();
+        
         RemoveButtons();
         AddButtons();
     }
@@ -49,34 +45,22 @@ public class ShopScrollList : MonoBehaviour
             newButton.transform.SetParent(contentPanel);
 
             CustomButton customBtn = newButton.GetComponent<CustomButton>();
-            customBtn.Setup(item, this);
+           // customBtn.Setup(item, this);
         }
     }
 
     public void TryTransferItemToOtherShop(Item item)
     {
-        if (otherShop.gold >= item.price)
-        {
-            gold += item.price;
-            otherShop.gold -= item.price;
-
-            AddItem(item, otherShop);
-            RemoveItem(item, this);
-
-            RefreshDisplay();
-            otherShop.RefreshDisplay();
-            Debug.Log("enough gold");
-
-        }
+        
         Debug.Log("attempted");
     }
 
-    void AddItem(Item itemToAdd, ShopScrollList shopList)
+    void AddItem(Item itemToAdd, ActivateStory shopList)
     {
         shopList.itemList.Add(itemToAdd);
     }
 
-    private void RemoveItem(Item itemToRemove, ShopScrollList shopList)
+    private void RemoveItem(Item itemToRemove, ActivateStory shopList)
     {
         for (int i = shopList.itemList.Count - 1; i >= 0; i--)
         {
